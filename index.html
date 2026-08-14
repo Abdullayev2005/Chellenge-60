@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>60 KUN — jurnal</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0C1216">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="60 KUN">
+<link rel="apple-touch-icon" href="icon-192.png">
+<style>
+  :root{
+    --paper:#E3E8EA;
+    --card:#EEF1F2;
+    --ink:#0C1216;
+    --soft:#5A686F;
+    --rule:#B7C3C9;
+    --done:#16402E;
+    --miss:#7B2E22;
+    --brass:#8A6A2F;
+    --mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:var(--mono);
+    font-size:14px;
+    line-height:1.5;
+    padding:20px 16px 60px;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:660px;margin:0 auto}
+
+  .eyebrow{
+    font-size:10px;letter-spacing:.22em;text-transform:uppercase;
+    color:var(--soft);
+  }
+  header{border-bottom:2px solid var(--ink);padding-bottom:12px;margin-bottom:18px}
+  .titlerow{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin-top:6px}
+  h1{font-size:44px;line-height:.9;letter-spacing:-.04em;font-weight:700}
+  .counter{text-align:right;font-size:11px;letter-spacing:.1em;color:var(--soft);white-space:nowrap}
+  .counter b{display:block;font-size:22px;color:var(--ink);letter-spacing:-.02em}
+
+  /* deficit bars — the signature: elapsed vs actually done */
+  .bars{margin:16px 0 22px}
+  .barrow{display:flex;align-items:center;gap:10px;margin-bottom:5px}
+  .barlabel{font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--soft);width:66px;flex:none}
+  .bartrack{flex:1;height:9px;background:var(--card);border:1px solid var(--rule)}
+  .barfill{height:100%;transition:width .4s ease}
+  .barfill.elapsed{background:var(--rule)}
+  .barfill.done{background:var(--done)}
+  .barnum{font-size:10px;color:var(--soft);width:26px;text-align:right;flex:none}
+  .deficit{font-size:10px;letter-spacing:.1em;color:var(--miss);text-transform:uppercase;margin-top:6px}
+
+  .warn{
+    border:1px solid var(--miss);border-left-width:4px;
+    background:rgba(123,46,34,.06);
+    padding:10px 12px;margin-bottom:18px;font-size:12px;color:var(--miss);
+  }
+
+  section{margin-bottom:26px}
+  .shead{
+    display:flex;justify-content:space-between;align-items:baseline;
+    border-bottom:1px solid var(--rule);padding-bottom:6px;margin-bottom:12px;
+  }
+  .shead h2{font-size:11px;letter-spacing:.2em;text-transform:uppercase;font-weight:700}
+  .linkbtn{
+    background:none;border:none;font-family:var(--mono);font-size:10px;
+    letter-spacing:.12em;text-transform:uppercase;color:var(--soft);
+    cursor:pointer;text-decoration:underline;text-underline-offset:3px;padding:2px;
+  }
+  .linkbtn:hover{color:var(--ink)}
+
+  /* today */
+  .habit{
+    display:flex;align-items:center;gap:12px;
+    background:var(--card);border:1px solid var(--rule);
+    padding:13px 14px;margin-bottom:7px;cursor:pointer;
+    transition:border-color .15s, background .15s;
+  }
+  .habit:hover{border-color:var(--soft)}
+  .habit:focus-visible{outline:2px solid var(--brass);outline-offset:2px}
+  .box{
+    width:20px;height:20px;flex:none;border:1.5px solid var(--ink);
+    display:grid;place-items:center;font-size:13px;color:#fff;
+  }
+  .habit.on{background:rgba(22,64,46,.08);border-color:var(--done)}
+  .habit.on .box{background:var(--done);border-color:var(--done)}
+  .habit.on .htext{text-decoration:line-through;text-decoration-thickness:1px;color:var(--soft)}
+  .htext{flex:1;font-size:13px}
+  .hidx{font-size:9px;color:var(--soft);letter-spacing:.1em}
+
+  .note{
+    width:100%;font-family:var(--mono);font-size:12px;color:var(--ink);
+    background:var(--card);border:1px solid var(--rule);padding:10px 12px;
+    margin-top:8px;resize:vertical;min-height:52px;
+  }
+  .note:focus{outline:none;border-color:var(--brass)}
+
+  /* grid */
+  .grid{display:grid;grid-template-columns:repeat(10,1fr);gap:4px}
+  .cell{
+    aspect-ratio:1;border:1px solid var(--rule);background:var(--card);
+    display:grid;place-items:center;font-size:9px;color:var(--soft);
+    cursor:default;position:relative;
+  }
+  .cell.done{background:var(--done);border-color:var(--done);color:#D6E2DA}
+  .cell.part{background:linear-gradient(180deg,var(--card) 50%,rgba(22,64,46,.35) 50%);border-color:var(--done)}
+  .cell.miss{border-color:var(--miss);color:var(--miss);background:rgba(123,46,34,.07)}
+  .cell.today{outline:2px solid var(--brass);outline-offset:1px;z-index:1}
+  .cell.editable{cursor:pointer}
+  .cell.editable:hover{border-color:var(--ink)}
+
+  .stats{display:flex;gap:0;border:1px solid var(--rule);background:var(--card);margin-top:14px}
+  .stat{flex:1;padding:11px 10px;border-right:1px solid var(--rule)}
+  .stat:last-child{border-right:none}
+  .stat b{display:block;font-size:20px;letter-spacing:-.02em}
+  .stat span{font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--soft)}
+
+  .rep{border:1px solid var(--rule);background:var(--card)}
+  .repline{display:flex;align-items:center;gap:10px;padding:9px 12px;border-bottom:1px solid var(--rule);font-size:11px}
+  .repline:last-child{border-bottom:none}
+  .repname{width:104px;flex:none;color:var(--soft);letter-spacing:.05em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .reptrack{flex:1;height:7px;background:var(--paper);border:1px solid var(--rule)}
+  .repfill{height:100%;background:var(--done)}
+  .repfill.low{background:var(--miss)}
+  .repval{width:54px;text-align:right;flex:none;font-variant-numeric:tabular-nums}
+  .repnote{font-size:10px;color:var(--soft);margin-top:8px;letter-spacing:.06em}
+  .rules{font-size:11px;color:var(--soft);line-height:1.7}
+  .rules li{list-style:none;padding-left:16px;position:relative}
+  .rules li::before{content:"—";position:absolute;left:0}
+
+  /* editor */
+  .row{display:flex;gap:6px;margin-bottom:6px}
+  .row input{
+    flex:1;font-family:var(--mono);font-size:12px;padding:9px 10px;
+    border:1px solid var(--rule);background:var(--card);color:var(--ink);
+  }
+  .row input:focus{outline:none;border-color:var(--brass)}
+  .del{
+    border:1px solid var(--rule);background:var(--card);color:var(--miss);
+    font-family:var(--mono);cursor:pointer;width:36px;flex:none;font-size:14px;
+  }
+  .del:hover{border-color:var(--miss)}
+  .btn{
+    font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+    padding:10px 16px;border:1.5px solid var(--ink);background:var(--ink);color:var(--paper);
+    cursor:pointer;
+  }
+  .btn.ghost{background:none;color:var(--ink)}
+  .btn:hover{opacity:.85}
+  .btnrow{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+  .hidden{display:none}
+  .status{font-size:10px;color:var(--soft);letter-spacing:.1em;margin-top:14px;text-transform:uppercase}
+  .status.err{color:var(--miss)}
+
+  @media (max-width:480px){
+    h1{font-size:34px}
+    .grid{grid-template-columns:repeat(6,1fr)}
+    .barlabel{width:54px}
+  }
+  @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap" id="app">
+  <div class="status" id="boot">Yuklanmoqda…</div>
+</div>
+
+<script>
+const DEFAULT_HABITS = [
+  "Harakat — 30 daqiqa",
+  "Audio kitob — 20 daqiqa",
+  "Uyqu — 23:00 da yotish",
+  "Instagram — 30 daqiqadan oshmaydi"
+];
+const KEY = "kun60:state";
+const TOTAL = 60;
+
+let S = null;
+let editing = false;
+
+const ymd = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+const parse = s => { const [y,m,d] = s.split("-").map(Number); return new Date(y, m-1, d); };
+const addDays = (s,n) => { const d = parse(s); d.setDate(d.getDate()+n); return ymd(d); };
+const daysBetween = (a,b) => Math.round((parse(b) - parse(a)) / 86400000);
+
+async function load(){
+  try{
+    const r = { value: localStorage.getItem(KEY) };
+    if(!r.value) throw new Error("empty");
+    S = JSON.parse(r.value);
+    if(!S.habits || !S.habits.length) S.habits = DEFAULT_HABITS.slice();
+    if(!S.days) S.days = {};
+  }catch(e){
+    S = { start: ymd(new Date()), habits: DEFAULT_HABITS.slice(), days:{} };
+    await save();
+  }
+}
+async function save(){
+  try{
+    localStorage.setItem(KEY, JSON.stringify(S));
+    setStatus("Saqlandi · " + new Date().toLocaleTimeString("uz-UZ",{hour:"2-digit",minute:"2-digit"}), false);
+  }catch(e){
+    setStatus("Saqlanmadi — qayta urinib ko'ring", true);
+  }
+}
+function setStatus(t, err){
+  const el = document.getElementById("status");
+  if(!el) return;
+  el.textContent = t;
+  el.className = "status" + (err ? " err" : "");
+}
+
+const dayN = () => Math.min(daysBetween(S.start, ymd(new Date())) + 1, TOTAL);
+const dateOf = n => addDays(S.start, n-1);
+const doneCount = key => (S.days[key]?.done || []).length;
+const isFull = key => S.habits.length > 0 && doneCount(key) >= S.habits.length;
+
+function stats(){
+  const today = dayN();
+  let full = 0;
+  for(let i=1;i<=Math.min(today,TOTAL);i++) if(isFull(dateOf(i))) full++;
+
+  let cur = 0;
+  for(let i=today;i>=1;i--){
+    if(isFull(dateOf(i))) cur++;
+    else if(i === today) continue;   // bugun hali tugamagan
+    else break;
+  }
+  let best = 0, run = 0;
+  for(let i=1;i<=Math.min(today,TOTAL);i++){
+    if(isFull(dateOf(i))){ run++; best = Math.max(best, run); } else run = 0;
+  }
+  const elapsed = Math.min(today, TOTAL);
+  return { today, full, cur, best, elapsed, gap: elapsed - full };
+}
+
+function render(){
+  const st = stats();
+  const tkey = dateOf(Math.min(st.today, TOTAL));
+  const day = S.days[tkey] || { done:[], note:"" };
+  const yKey = st.today > 1 ? dateOf(st.today - 1) : null;
+  const missedYesterday = yKey && !isFull(yKey);
+
+  const cells = [];
+  for(let i=1;i<=TOTAL;i++){
+    const k = dateOf(i);
+    const c = doneCount(k);
+    let cls = "cell";
+    if(i < st.today){ cls += isFull(k) ? " done" : (c > 0 ? " part" : " miss"); }
+    else if(i === st.today){ cls += " today" + (isFull(k) ? " done" : (c > 0 ? " part" : "")); }
+    if(i === st.today || i === st.today - 1) cls += " editable";
+    cells.push(`<div class="${cls}" data-day="${i}" title="${k}">${String(i).padStart(2,"0")}</div>`);
+  }
+
+  document.getElementById("app").innerHTML = `
+    <header>
+      <div class="eyebrow">Shaxsiy jurnal · ${S.start} dan</div>
+      <div class="titlerow">
+        <h1>60 KUN</h1>
+        <div class="counter">Bugun<b>${String(Math.min(st.today,TOTAL)).padStart(2,"0")} / 60</b></div>
+      </div>
+    </header>
+
+    <div class="bars">
+      <div class="barrow">
+        <div class="barlabel">O'tgan</div>
+        <div class="bartrack"><div class="barfill elapsed" style="width:${st.elapsed/TOTAL*100}%"></div></div>
+        <div class="barnum">${st.elapsed}</div>
+      </div>
+      <div class="barrow">
+        <div class="barlabel">Bajarilgan</div>
+        <div class="bartrack"><div class="barfill done" style="width:${st.full/TOTAL*100}%"></div></div>
+        <div class="barnum">${st.full}</div>
+      </div>
+      ${st.gap > 0 ? `<div class="deficit">Qarz: ${st.gap} kun</div>` : ``}
+    </div>
+
+    ${missedYesterday && !isFull(tkey) ? `<div class="warn">Kecha yopilmagan. Qoida: ketma-ket ikki kun bo'lmaydi. Bugun majburiy.</div>` : ``}
+
+    <section>
+      <div class="shead">
+        <h2>Bugun — kunlik minimum</h2>
+        <button class="linkbtn" id="edit">${editing ? "Yopish" : "Tahrirlash"}</button>
+      </div>
+      <div id="todaybox">
+        ${editing ? renderEditor() : S.habits.map((h,i)=>`
+          <div class="habit ${day.done.includes(i) ? "on":""}" data-h="${i}" tabindex="0" role="checkbox" aria-checked="${day.done.includes(i)}">
+            <div class="box">${day.done.includes(i) ? "✓" : ""}</div>
+            <div class="htext">${escape(h)}</div>
+            <div class="hidx">${String(i+1).padStart(2,"0")}</div>
+          </div>`).join("")}
+        ${editing ? "" : `<textarea class="note" id="note" maxlength="160" placeholder="Kun haqida bir qator — ixtiyoriy">${escape(day.note||"")}</textarea>`}
+      </div>
+    </section>
+
+    <section>
+      <div class="shead"><h2>Jadval</h2><span class="eyebrow">Bugun va kecha tahrirlanadi</span></div>
+      <div class="grid">${cells.join("")}</div>
+      <div class="stats">
+        <div class="stat"><b>${st.cur}</b><span>Joriy seriya</span></div>
+        <div class="stat"><b>${st.best}</b><span>Eng uzun</span></div>
+        <div class="stat"><b>${st.full}</b><span>Yopilgan kun</span></div>
+      </div>
+    </section>
+
+    <section>
+      <div class="shead"><h2>Hisobot</h2><span class="eyebrow">O'tgan kunlarga nisbatan</span></div>
+      <div class="rep">${weekLines(st)}</div>
+      <div class="repnote">Har bir band bo'yicha:</div>
+      <div class="rep" style="margin-top:6px">${habitLines(st)}</div>
+      <div class="btnrow">
+        <button class="btn ghost" id="copyrep">Hisobotni nusxalash</button>
+      </div>
+    </section>
+
+    <section>
+      <div class="shead"><h2>Qoidalar</h2></div>
+      <ul class="rules">
+        <li>Minimum bajarilsa — kun yopiq. Ko'p qilgani hisobga o'tmaydi.</li>
+        <li>Ketma-ket ikki kun tashlanmaydi. Bitta kun — xato, ikkitasi — tugash.</li>
+        <li>Kecha va bugundan boshqa kun tahrirlanmaydi. Yozilgan yozilgan.</li>
+        <li>Tarozi haftada bir marta, dushanba ertalab.</li>
+      </ul>
+      <div class="btnrow">
+        <button class="btn ghost" id="reset">Jurnalni nolga qaytarish</button>
+      </div>
+      <div class="status" id="status"></div>
+    </section>
+  `;
+  bind();
+}
+
+function weekData(st){
+  const out = [];
+  for(let w=0; w*7 < TOTAL; w++){
+    const from = w*7+1, to = Math.min(from+6, TOTAL);
+    let el = 0, full = 0;
+    for(let i=from;i<=to;i++){
+      if(i > st.today) continue;
+      el++;
+      if(isFull(dateOf(i))) full++;
+    }
+    out.push({ n:w+1, from, to, el, full });
+  }
+  return out;
+}
+function habitData(st){
+  return S.habits.map((h,i)=>{
+    let el = 0, done = 0;
+    for(let d=1; d<=Math.min(st.today, TOTAL); d++){
+      el++;
+      if((S.days[dateOf(d)]?.done || []).includes(i)) done++;
+    }
+    return { name:h, el, done };
+  });
+}
+function bar(done, el){
+  const pct = el ? Math.round(done/el*100) : 0;
+  const cls = pct < 60 ? "repfill low" : "repfill";
+  return `<div class="reptrack"><div class="${cls}" style="width:${pct}%"></div></div>
+          <div class="repval">${done}/${el}</div>`;
+}
+function weekLines(st){
+  const rows = weekData(st).filter(w => w.el > 0);
+  if(!rows.length) return `<div class="repline"><div class="repname">Hali bo'sh</div></div>`;
+  return rows.map(w => `<div class="repline"><div class="repname">${w.n}-hafta · ${w.from}–${w.to}</div>${bar(w.full, w.el)}</div>`).join("");
+}
+function habitLines(st){
+  const rows = habitData(st);
+  if(!rows.length || st.today < 1) return `<div class="repline"><div class="repname">Hali bo'sh</div></div>`;
+  return rows.map(h => `<div class="repline"><div class="repname" title="${escape(h.name)}">${escape(h.name)}</div>${bar(h.done, h.el)}</div>`).join("");
+}
+function reportText(st){
+  const L = [];
+  L.push(`60 KUN — HISOBOT`);
+  L.push(`Boshlangan: ${S.start} · Bugun: ${Math.min(st.today,TOTAL)}/60`);
+  L.push(`Yopilgan kun: ${st.full}/${st.elapsed} · Qarz: ${st.gap}`);
+  L.push(`Joriy seriya: ${st.cur} · Eng uzun: ${st.best}`);
+  L.push(``);
+  L.push(`HAFTALAR`);
+  weekData(st).filter(w=>w.el>0).forEach(w => L.push(`  ${w.n}-hafta (${w.from}–${w.to}): ${w.full}/${w.el}`));
+  L.push(``);
+  L.push(`BANDLAR`);
+  habitData(st).forEach(h => L.push(`  ${h.name}: ${h.done}/${h.el} (${h.el?Math.round(h.done/h.el*100):0}%)`));
+  const notes = Object.entries(S.days).filter(([k,v]) => v.note && v.note.trim()).sort();
+  if(notes.length){
+    L.push(``);
+    L.push(`QAYDLAR`);
+    notes.forEach(([k,v]) => L.push(`  ${k} — ${v.note.trim()}`));
+  }
+  return L.join("\n");
+}
+
+function renderEditor(){
+  return `
+    <div id="rows">
+      ${S.habits.map((h,i)=>`<div class="row"><input value="${escape(h)}" data-e="${i}" maxlength="70"><button class="del" data-d="${i}" aria-label="O'chirish">×</button></div>`).join("")}
+    </div>
+    <div class="btnrow">
+      <button class="btn ghost" id="add">+ Qator</button>
+      <button class="btn" id="savehabits">Saqlash</button>
+    </div>`;
+}
+
+function escape(s){ return String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
+
+function bind(){
+  const st = stats();
+  const tkey = dateOf(Math.min(st.today, TOTAL));
+
+  document.querySelectorAll(".habit").forEach(el=>{
+    const toggle = async ()=>{
+      const i = +el.dataset.h;
+      const d = S.days[tkey] || { done:[], note:"" };
+      d.done = d.done.includes(i) ? d.done.filter(x=>x!==i) : [...d.done, i];
+      S.days[tkey] = d;
+      render(); await save();
+    };
+    el.addEventListener("click", toggle);
+    el.addEventListener("keydown", e=>{ if(e.key===" "||e.key==="Enter"){ e.preventDefault(); toggle(); }});
+  });
+
+  const note = document.getElementById("note");
+  if(note) note.addEventListener("blur", async ()=>{
+    const d = S.days[tkey] || { done:[], note:"" };
+    d.note = note.value; S.days[tkey] = d; await save();
+  });
+
+  document.querySelectorAll(".cell.editable").forEach(c=>{
+    c.addEventListener("click", async ()=>{
+      const n = +c.dataset.day, k = dateOf(n);
+      const d = S.days[k] || { done:[], note:"" };
+      d.done = isFull(k) ? [] : S.habits.map((_,i)=>i);   // to'liq yopish / bo'shatish
+      S.days[k] = d;
+      render(); await save();
+    });
+  });
+
+  const eb = document.getElementById("edit");
+  if(eb) eb.addEventListener("click", ()=>{ editing = !editing; render(); });
+
+  const add = document.getElementById("add");
+  if(add) add.addEventListener("click", ()=>{
+    collect(); S.habits.push(""); render();
+  });
+  document.querySelectorAll(".del").forEach(b=>b.addEventListener("click", ()=>{
+    collect(); S.habits.splice(+b.dataset.d, 1); render();
+  }));
+  const sh = document.getElementById("savehabits");
+  if(sh) sh.addEventListener("click", async ()=>{
+    collect();
+    S.habits = S.habits.map(h=>h.trim()).filter(Boolean);
+    if(!S.habits.length) S.habits = DEFAULT_HABITS.slice();
+    editing = false; render(); await save();
+  });
+
+  const cp = document.getElementById("copyrep");
+  if(cp) cp.addEventListener("click", async ()=>{
+    const txt = reportText(stats());
+    try{
+      await navigator.clipboard.writeText(txt);
+      setStatus("Hisobot nusxalandi", false);
+    }catch(e){
+      const ta = document.createElement("textarea");
+      ta.value = txt; document.body.appendChild(ta); ta.select();
+      try{ document.execCommand("copy"); setStatus("Hisobot nusxalandi", false); }
+      catch(_){ setStatus("Nusxalanmadi — qo'lda belgilang", true); }
+      ta.remove();
+    }
+  });
+
+  const rs = document.getElementById("reset");
+  if(rs) rs.addEventListener("click", async ()=>{
+    if(!confirm("Butun jurnal o'chadi va 60 kun bugundan qayta boshlanadi. Davom etaymi?")) return;
+    S = { start: ymd(new Date()), habits: S.habits, days:{} };
+    render(); await save();
+  });
+}
+
+function collect(){
+  document.querySelectorAll("[data-e]").forEach(inp=>{ S.habits[+inp.dataset.e] = inp.value; });
+}
+
+(async ()=>{ await load(); render(); })();
+
+if("serviceWorker" in navigator){
+  window.addEventListener("load", ()=> navigator.serviceWorker.register("sw.js").catch(()=>{}));
+}
+</script>
+</body>
+</html>
