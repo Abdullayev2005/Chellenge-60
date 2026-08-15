@@ -2,489 +2,857 @@
 <html lang="uz">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>60 KUN — jurnal</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>JURNAL — 60 kun</title>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0C1216">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
-<meta name="apple-mobile-web-app-title" content="60 KUN">
+<meta name="apple-mobile-web-app-title" content="JURNAL">
 <link rel="apple-touch-icon" href="icon-192.png">
 <style>
   :root{
-    --paper:#E3E8EA;
-    --card:#EEF1F2;
-    --ink:#0C1216;
-    --soft:#5A686F;
-    --rule:#B7C3C9;
-    --done:#16402E;
-    --miss:#7B2E22;
-    --brass:#8A6A2F;
+    --paper:#E3E8EA; --card:#EEF1F2; --ink:#0C1216; --soft:#5A686F;
+    --rule:#B7C3C9; --done:#16402E; --miss:#7B2E22; --brass:#8A6A2F; --blue:#24455C;
     --mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
   }
-  *{box-sizing:border-box;margin:0;padding:0}
-  body{
-    background:var(--paper);
-    color:var(--ink);
-    font-family:var(--mono);
-    font-size:14px;
-    line-height:1.5;
-    padding:20px 16px 60px;
-    -webkit-font-smoothing:antialiased;
-  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  body{background:var(--paper);color:var(--ink);font-family:var(--mono);font-size:14px;line-height:1.5;
+       padding:18px 14px calc(78px + env(safe-area-inset-bottom));-webkit-font-smoothing:antialiased}
   .wrap{max-width:660px;margin:0 auto}
 
-  .eyebrow{
-    font-size:10px;letter-spacing:.22em;text-transform:uppercase;
-    color:var(--soft);
-  }
-  header{border-bottom:2px solid var(--ink);padding-bottom:12px;margin-bottom:18px}
-  .titlerow{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin-top:6px}
-  h1{font-size:44px;line-height:.9;letter-spacing:-.04em;font-weight:700}
-  .counter{text-align:right;font-size:11px;letter-spacing:.1em;color:var(--soft);white-space:nowrap}
-  .counter b{display:block;font-size:22px;color:var(--ink);letter-spacing:-.02em}
+  header{border-bottom:2px solid var(--ink);padding-bottom:10px;margin-bottom:14px}
+  .eyebrow{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--soft)}
+  .titlerow{display:flex;align-items:flex-end;justify-content:space-between;gap:10px;margin-top:4px}
+  h1{font-size:32px;line-height:.95;letter-spacing:-.04em}
+  .counter{text-align:right;font-size:10px;letter-spacing:.1em;color:var(--soft);white-space:nowrap}
+  .counter b{display:block;font-size:19px;color:var(--ink)}
 
-  /* deficit bars — the signature: elapsed vs actually done */
-  .bars{margin:16px 0 22px}
-  .barrow{display:flex;align-items:center;gap:10px;margin-bottom:5px}
-  .barlabel{font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--soft);width:66px;flex:none}
-  .bartrack{flex:1;height:9px;background:var(--card);border:1px solid var(--rule)}
-  .barfill{height:100%;transition:width .4s ease}
-  .barfill.elapsed{background:var(--rule)}
-  .barfill.done{background:var(--done)}
-  .barnum{font-size:10px;color:var(--soft);width:26px;text-align:right;flex:none}
-  .deficit{font-size:10px;letter-spacing:.1em;color:var(--miss);text-transform:uppercase;margin-top:6px}
+  nav{position:fixed;left:0;right:0;bottom:0;display:flex;background:var(--ink);
+      padding-bottom:env(safe-area-inset-bottom);z-index:20}
+  nav button{flex:1;background:none;border:none;color:#7E8E96;font-family:var(--mono);
+             font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;padding:15px 4px;cursor:pointer}
+  nav button.on{color:var(--paper);box-shadow:inset 0 3px 0 var(--brass)}
 
-  .warn{
-    border:1px solid var(--miss);border-left-width:4px;
-    background:rgba(123,46,34,.06);
-    padding:10px 12px;margin-bottom:18px;font-size:12px;color:var(--miss);
-  }
+  section{margin-bottom:22px}
+  .shead{display:flex;justify-content:space-between;align-items:baseline;
+         border-bottom:1px solid var(--rule);padding-bottom:5px;margin-bottom:10px}
+  .shead h2{font-size:10.5px;letter-spacing:.2em;text-transform:uppercase}
+  .shead span{font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--soft)}
 
-  section{margin-bottom:26px}
-  .shead{
-    display:flex;justify-content:space-between;align-items:baseline;
-    border-bottom:1px solid var(--rule);padding-bottom:6px;margin-bottom:12px;
-  }
-  .shead h2{font-size:11px;letter-spacing:.2em;text-transform:uppercase;font-weight:700}
-  .linkbtn{
-    background:none;border:none;font-family:var(--mono);font-size:10px;
-    letter-spacing:.12em;text-transform:uppercase;color:var(--soft);
-    cursor:pointer;text-decoration:underline;text-underline-offset:3px;padding:2px;
-  }
-  .linkbtn:hover{color:var(--ink)}
+  .card{background:var(--card);border:1px solid var(--rule)}
+  .pad{padding:12px}
 
-  /* today */
-  .habit{
-    display:flex;align-items:center;gap:12px;
-    background:var(--card);border:1px solid var(--rule);
-    padding:13px 14px;margin-bottom:7px;cursor:pointer;
-    transition:border-color .15s, background .15s;
-  }
-  .habit:hover{border-color:var(--soft)}
-  .habit:focus-visible{outline:2px solid var(--brass);outline-offset:2px}
-  .box{
-    width:20px;height:20px;flex:none;border:1.5px solid var(--ink);
-    display:grid;place-items:center;font-size:13px;color:#fff;
-  }
+  /* habits */
+  .habit{display:flex;align-items:center;gap:11px;background:var(--card);border:1px solid var(--rule);
+         padding:12px;margin-bottom:6px;cursor:pointer}
+  .box{width:19px;height:19px;flex:none;border:1.5px solid var(--ink);display:grid;place-items:center;
+       font-size:12px;color:#fff}
   .habit.on{background:rgba(22,64,46,.08);border-color:var(--done)}
   .habit.on .box{background:var(--done);border-color:var(--done)}
-  .habit.on .htext{text-decoration:line-through;text-decoration-thickness:1px;color:var(--soft)}
-  .htext{flex:1;font-size:13px}
-  .hidx{font-size:9px;color:var(--soft);letter-spacing:.1em}
+  .habit.on .htext{text-decoration:line-through;color:var(--soft)}
+  .htext{flex:1;font-size:12.5px}
 
-  .note{
-    width:100%;font-family:var(--mono);font-size:12px;color:var(--ink);
-    background:var(--card);border:1px solid var(--rule);padding:10px 12px;
-    margin-top:8px;resize:vertical;min-height:52px;
-  }
-  .note:focus{outline:none;border-color:var(--brass)}
+  /* scales */
+  .srow{display:flex;align-items:center;gap:8px;padding:9px 12px;border-bottom:1px solid var(--rule)}
+  .srow:last-child{border-bottom:none}
+  .slabel{font-size:9.5px;letter-spacing:.11em;text-transform:uppercase;color:var(--soft);width:84px;flex:none}
+  .scale{display:flex;gap:4px;flex:1}
+  .sb{flex:1;font-family:var(--mono);font-size:12px;padding:7px 0;border:1px solid var(--rule);
+      background:var(--paper);color:var(--soft);cursor:pointer}
+  .sb.on{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+  input.num{width:78px;font-family:var(--mono);font-size:12px;padding:7px 8px;border:1px solid var(--rule);
+            background:var(--paper);color:var(--ink);text-align:center}
+  input.num:focus,textarea:focus,input.txt:focus{outline:none;border-color:var(--brass)}
+  .sunit{font-size:9.5px;color:var(--soft);letter-spacing:.1em}
 
-  /* grid */
-  .grid{display:grid;grid-template-columns:repeat(10,1fr);gap:4px}
-  .cell{
-    aspect-ratio:1;border:1px solid var(--rule);background:var(--card);
-    display:grid;place-items:center;font-size:9px;color:var(--soft);
-    cursor:default;position:relative;
-  }
+  /* chips */
+  .chips{display:flex;flex-wrap:wrap;gap:5px}
+  .chip{font-family:var(--mono);font-size:11px;padding:7px 10px;border:1px solid var(--rule);
+        background:var(--card);color:var(--soft);cursor:pointer}
+  .chip.on{background:var(--blue);border-color:var(--blue);color:#E6EDF1}
+  .chip.neg.on{background:var(--miss);border-color:var(--miss)}
+  .chip.pos.on{background:var(--done);border-color:var(--done)}
+
+  textarea{width:100%;font-family:var(--mono);font-size:12.5px;line-height:1.65;color:var(--ink);
+           background:var(--card);border:1px solid var(--rule);padding:11px;resize:vertical}
+  textarea.big{min-height:130px}
+  textarea.mid{min-height:80px}
+  input.txt{width:100%;font-family:var(--mono);font-size:12.5px;padding:9px 11px;
+            border:1px solid var(--rule);background:var(--card);color:var(--ink)}
+  .qbox{border-left:3px solid var(--brass);padding:10px 12px;background:var(--card);
+        border:1px solid var(--rule);border-left:3px solid var(--brass);margin-bottom:6px}
+  .qtext{font-size:12.5px;line-height:1.5}
+  .qmeta{font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--soft);margin-bottom:5px}
+
+  /* finance */
+  .fgrid{display:flex;gap:6px;flex-wrap:wrap}
+  .fcell{flex:1;min-width:96px}
+  .fcell label{display:block;font-size:9px;letter-spacing:.11em;text-transform:uppercase;color:var(--soft);margin-bottom:4px}
+  .fcell input{width:100%;font-family:var(--mono);font-size:13px;padding:9px 10px;border:1px solid var(--rule);
+               background:var(--card);color:var(--ink)}
+  .fcell input:focus{outline:none;border-color:var(--brass)}
+
+  /* stats */
+  .stats{display:flex;border:1px solid var(--rule);background:var(--card)}
+  .stat{flex:1;padding:10px;border-right:1px solid var(--rule)}
+  .stat:last-child{border-right:none}
+  .stat b{display:block;font-size:19px;letter-spacing:-.02em}
+  .stat span{font-size:8.5px;letter-spacing:.11em;text-transform:uppercase;color:var(--soft)}
+
+  .grid{display:grid;grid-template-columns:repeat(10,1fr);gap:3px}
+  .cell{aspect-ratio:1;border:1px solid var(--rule);background:var(--card);display:grid;place-items:center;
+        font-size:8.5px;color:var(--soft)}
   .cell.done{background:var(--done);border-color:var(--done);color:#D6E2DA}
   .cell.part{background:linear-gradient(180deg,var(--card) 50%,rgba(22,64,46,.35) 50%);border-color:var(--done)}
   .cell.miss{border-color:var(--miss);color:var(--miss);background:rgba(123,46,34,.07)}
-  .cell.today{outline:2px solid var(--brass);outline-offset:1px;z-index:1}
-  .cell.editable{cursor:pointer}
-  .cell.editable:hover{border-color:var(--ink)}
+  .cell.today{outline:2px solid var(--brass);outline-offset:1px}
+  .cell.tap{cursor:pointer}
 
-  .stats{display:flex;gap:0;border:1px solid var(--rule);background:var(--card);margin-top:14px}
-  .stat{flex:1;padding:11px 10px;border-right:1px solid var(--rule)}
-  .stat:last-child{border-right:none}
-  .stat b{display:block;font-size:20px;letter-spacing:-.02em}
-  .stat span{font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--soft)}
+  /* feed */
+  .entry{border:1px solid var(--rule);background:var(--card);margin-bottom:7px}
+  .ehead{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;cursor:pointer;gap:8px}
+  .eday{font-size:11px;letter-spacing:.06em}
+  .edate{font-size:9px;color:var(--soft);letter-spacing:.08em}
+  .edots{display:flex;gap:3px;align-items:center}
+  .dot{width:7px;height:7px;border:1px solid var(--rule)}
+  .dot.f{background:var(--done);border-color:var(--done)}
+  .ebody{padding:0 12px 12px;font-size:12px;line-height:1.6;border-top:1px solid var(--rule);padding-top:10px}
+  .ebody h4{font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--soft);margin:10px 0 3px}
+  .ebody h4:first-child{margin-top:0}
+  .etags{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px}
+  .etag{font-size:9.5px;padding:3px 7px;border:1px solid var(--rule);color:var(--soft)}
+  .hidden{display:none}
 
-  .rep{border:1px solid var(--rule);background:var(--card)}
-  .repline{display:flex;align-items:center;gap:10px;padding:9px 12px;border-bottom:1px solid var(--rule);font-size:11px}
+  /* charts */
+  .chartbox{border:1px solid var(--rule);background:var(--card);padding:11px}
+  .legend{display:flex;gap:12px;flex-wrap:wrap;margin-top:7px}
+  .lg{display:flex;align-items:center;gap:5px;font-size:8.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--soft)}
+  .swatch{width:12px;height:3px;flex:none}
+  .repline{display:flex;align-items:center;gap:9px;padding:8px 11px;border-bottom:1px solid var(--rule);font-size:11px}
   .repline:last-child{border-bottom:none}
-  .repname{width:104px;flex:none;color:var(--soft);letter-spacing:.05em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .repname{width:112px;flex:none;color:var(--soft);letter-spacing:.04em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .reptrack{flex:1;height:7px;background:var(--paper);border:1px solid var(--rule)}
   .repfill{height:100%;background:var(--done)}
   .repfill.low{background:var(--miss)}
-  .repval{width:54px;text-align:right;flex:none;font-variant-numeric:tabular-nums}
-  .repnote{font-size:10px;color:var(--soft);margin-top:8px;letter-spacing:.06em}
-  .rules{font-size:11px;color:var(--soft);line-height:1.7}
-  .rules li{list-style:none;padding-left:16px;position:relative}
-  .rules li::before{content:"—";position:absolute;left:0}
+  .repfill.alt{background:var(--blue)}
+  .repval{width:56px;text-align:right;flex:none;font-variant-numeric:tabular-nums}
+  .insight{border:1px solid var(--rule);border-left:3px solid var(--brass);background:var(--card);
+           padding:10px 12px;margin-bottom:6px;font-size:11.5px;line-height:1.6}
+  .empty{font-size:11px;color:var(--soft);padding:12px;border:1px dashed var(--rule);text-align:center}
 
-  /* editor */
-  .row{display:flex;gap:6px;margin-bottom:6px}
-  .row input{
-    flex:1;font-family:var(--mono);font-size:12px;padding:9px 10px;
-    border:1px solid var(--rule);background:var(--card);color:var(--ink);
-  }
-  .row input:focus{outline:none;border-color:var(--brass)}
-  .del{
-    border:1px solid var(--rule);background:var(--card);color:var(--miss);
-    font-family:var(--mono);cursor:pointer;width:36px;flex:none;font-size:14px;
-  }
-  .del:hover{border-color:var(--miss)}
-  .btn{
-    font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;
-    padding:10px 16px;border:1.5px solid var(--ink);background:var(--ink);color:var(--paper);
-    cursor:pointer;
-  }
+  .btn{font-family:var(--mono);font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;
+       padding:10px 14px;border:1.5px solid var(--ink);background:var(--ink);color:var(--paper);cursor:pointer}
   .btn.ghost{background:none;color:var(--ink)}
-  .btn:hover{opacity:.85}
-  .btnrow{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
-  .hidden{display:none}
-  .status{font-size:10px;color:var(--soft);letter-spacing:.1em;margin-top:14px;text-transform:uppercase}
+  .btnrow{display:flex;gap:6px;margin-top:9px;flex-wrap:wrap}
+  .linkbtn{background:none;border:none;font-family:var(--mono);font-size:9.5px;letter-spacing:.11em;
+           text-transform:uppercase;color:var(--soft);cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+  .row{display:flex;gap:5px;margin-bottom:5px}
+  .row input{flex:1;font-family:var(--mono);font-size:12px;padding:9px 10px;border:1px solid var(--rule);
+             background:var(--card);color:var(--ink)}
+  .del{border:1px solid var(--rule);background:var(--card);color:var(--miss);font-family:var(--mono);
+       cursor:pointer;width:34px;flex:none}
+  .status{font-size:9.5px;color:var(--soft);letter-spacing:.09em;margin-top:12px;text-transform:uppercase}
   .status.err{color:var(--miss)}
+  .warn{border:1px solid var(--miss);border-left-width:4px;background:rgba(123,46,34,.06);
+        padding:9px 11px;margin-bottom:14px;font-size:11.5px;color:var(--miss)}
 
-  @media (max-width:480px){
-    h1{font-size:34px}
-    .grid{grid-template-columns:repeat(6,1fr)}
-    .barlabel{width:54px}
-  }
+  @media (max-width:480px){ .grid{grid-template-columns:repeat(6,1fr)} h1{font-size:27px} }
   @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
 <body>
-<div class="wrap" id="app">
-  <div class="status" id="boot">Yuklanmoqda…</div>
-</div>
+<div class="wrap" id="app"><div class="status">Yuklanmoqda…</div></div>
+<nav id="nav"></nav>
 
 <script>
+const KEY = "jurnal60:v1";
+const TOTAL = 60;
+
 const DEFAULT_HABITS = [
   "Harakat — 30 daqiqa",
   "Audio kitob — 20 daqiqa",
-  "Uyqu — 23:00 da yotish",
+  "Uyqu — belgilangan vaqtda",
   "Instagram — 30 daqiqadan oshmaydi"
 ];
-const KEY = "kun60:state";
-const TOTAL = 60;
+
+const EMOTIONS = [
+  ["G'azab","neg"], ["Zo'riqish","neg"], ["Charchoq","neg"], ["Tushkunlik","neg"],
+  ["Xavotir","neg"], ["Bo'shashish","neg"], ["Yolg'izlik","neg"], ["Shubha","neg"],
+  ["Asabiylik","neg"], ["Aybdorlik","neg"],
+  ["Xotirjamlik","pos"], ["Ishtiyoq","pos"], ["Ishonch","pos"], ["Tetiklik","pos"],
+  ["Qoniqish","pos"], ["Aniqlik","pos"], ["Sovuqqonlik","pos"]
+];
+
+const PROMPTS = [
+  "Bugun nimadan qochding?",
+  "Bugungi eng og'ir 10 daqiqa qaysi edi va nima qilding?",
+  "Bugun o'zingga qanday yolg'on aytding?",
+  "Nima seni bugun to'xtatib qo'ydi?",
+  "Bugun nimadan keyin o'zingni kuchli his qilding?",
+  "Qaysi qaroringni ertaga afsuslanib eslaysan?",
+  "Nimani ertaga qoldirding va rostini aytganda nega?",
+  "Bugun kim yoki nima energiyangni oldi?",
+  "Bugun nimaga yo'q dedingmi? Yo'q desang, nima bo'lardi?",
+  "Bugungi kuning boshqalarga qanday ko'rindi, ichkaridan qanday edi?",
+  "Nimadan qo'rqding — va u haqiqatan xavflimi?",
+  "Bugun o'zingni eng yaxshi his qilgan payting qaysi soatda edi?",
+  "Kimning fikri bugun senga keragidan ortiq ta'sir qildi?",
+  "Bugun nimani boshqara olmading? Uni boshqarish sening ishingmi?",
+  "Bir yil oldingi o'zing bugungi kuningni ko'rsa nima derdi?",
+  "Bugun nima uchun minnatdorsan — kichik narsa ham bo'ladi?",
+  "Bugungi asabiylik aslida nimaning ustidan edi?",
+  "O'zingdan nimani yashirib yuribsan?",
+  "Bugun tanang senga nima dedi — og'riq, charchoq, yengillik?",
+  "Bugun qaysi ish rostdan muhim edi, qaysi biri shunchaki band bo'lish edi?",
+  "Kimga gapirmoqching, lekin gapirmading?",
+  "Bugun o'zingga nisbatan qattiq bo'ldingmi yoki adolatli?",
+  "Nima bo'lsa ertangi kun muvaffaqiyatli hisoblanadi?",
+  "Bugun nimadan zavq olding — ishdan tashqari?",
+  "Bugungi eng yomon 5 daqiqa nimadan boshlandi?",
+  "Nimani boshlashdan qo'rqyapsan, chunki yomon chiqishi mumkin?",
+  "Bugun kimni qo'llab-quvvatlading? Kim seni qo'llab-quvvatladi?",
+  "Sen tashlab ketishing kerak bo'lgan nima hali qo'lingda?",
+  "Bugun o'zingni kim deb his qilding — qaysi rolda?",
+  "60 kun tugagach, o'zingda qanday o'zgarishni ko'rmoqchisan?"
+];
 
 let S = null;
-let editing = false;
+let tab = "bugun";
+let editingHabits = false;
+let openEntry = null;
 
-const ymd = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
-const parse = s => { const [y,m,d] = s.split("-").map(Number); return new Date(y, m-1, d); };
-const addDays = (s,n) => { const d = parse(s); d.setDate(d.getDate()+n); return ymd(d); };
-const daysBetween = (a,b) => Math.round((parse(b) - parse(a)) / 86400000);
-
+/* ---------- storage ---------- */
 async function load(){
   try{
-    const r = { value: localStorage.getItem(KEY) };
-    if(!r.value) throw new Error("empty");
-    S = JSON.parse(r.value);
-    if(!S.habits || !S.habits.length) S.habits = DEFAULT_HABITS.slice();
-    if(!S.days) S.days = {};
+    const raw = localStorage.getItem(KEY);
+    if(!raw) throw new Error("empty");
+    S = JSON.parse(raw);
   }catch(e){
-    S = { start: ymd(new Date()), habits: DEFAULT_HABITS.slice(), days:{} };
-    await save();
+    S = { start: ymd(new Date()), habits: DEFAULT_HABITS.slice(), cur: "AED", days: {} };
+    await save(true);
   }
+  if(!S.habits || !S.habits.length) S.habits = DEFAULT_HABITS.slice();
+  if(!S.days) S.days = {};
+  if(!S.cur) S.cur = "AED";
 }
-async function save(){
+async function save(silent){
   try{
     localStorage.setItem(KEY, JSON.stringify(S));
-    setStatus("Saqlandi · " + new Date().toLocaleTimeString("uz-UZ",{hour:"2-digit",minute:"2-digit"}), false);
-  }catch(e){
-    setStatus("Saqlanmadi — qayta urinib ko'ring", true);
-  }
+    if(!silent) setStatus("Saqlandi · " + new Date().toLocaleTimeString("uz-UZ",{hour:"2-digit",minute:"2-digit"}), false);
+  }catch(e){ setStatus("Saqlanmadi — xotira to'lgan bo'lishi mumkin", true); }
 }
 function setStatus(t, err){
   const el = document.getElementById("status");
-  if(!el) return;
-  el.textContent = t;
-  el.className = "status" + (err ? " err" : "");
+  if(el){ el.textContent = t; el.className = "status" + (err ? " err" : ""); }
 }
 
-const dayN = () => Math.min(daysBetween(S.start, ymd(new Date())) + 1, TOTAL);
+/* ---------- dates ---------- */
+const ymd = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+const parseD = s => { const [y,m,d] = s.split("-").map(Number); return new Date(y, m-1, d); };
+const addDays = (s,n) => { const d = parseD(s); d.setDate(d.getDate()+n); return ymd(d); };
+const diffDays = (a,b) => Math.round((parseD(b) - parseD(a)) / 86400000);
+const dayN = () => Math.min(diffDays(S.start, ymd(new Date())) + 1, TOTAL);
 const dateOf = n => addDays(S.start, n-1);
-const doneCount = key => (S.days[key]?.done || []).length;
-const isFull = key => S.habits.length > 0 && doneCount(key) >= S.habits.length;
+const fmtDate = k => { const d = parseD(k); return d.toLocaleDateString("uz-UZ",{day:"2-digit",month:"short"}); };
+
+/* ---------- data helpers ---------- */
+const D = k => S.days[k] || {};
+function setDay(k, patch){
+  S.days[k] = Object.assign({ done:[], st:{}, tags:[], free:"", ans:"", note:"", fin:{} }, S.days[k] || {}, patch);
+}
+const doneCount = k => (D(k).done || []).length;
+const isFull = k => S.habits.length > 0 && doneCount(k) >= S.habits.length;
+const hasContent = k => {
+  const d = D(k);
+  return (d.free && d.free.trim()) || (d.ans && d.ans.trim()) || (d.note && d.note.trim()) ||
+         (d.tags && d.tags.length) || (d.st && Object.values(d.st).some(v => v != null)) ||
+         (d.done && d.done.length) || (d.fin && (d.fin.bal != null || d.fin.out != null || d.fin.in != null));
+};
+const promptFor = n => PROMPTS[(n - 1) % PROMPTS.length];
 
 function stats(){
   const today = dayN();
+  const elapsed = Math.max(0, Math.min(today, TOTAL));
   let full = 0;
-  for(let i=1;i<=Math.min(today,TOTAL);i++) if(isFull(dateOf(i))) full++;
-
+  for(let i=1;i<=elapsed;i++) if(isFull(dateOf(i))) full++;
   let cur = 0;
   for(let i=today;i>=1;i--){
     if(isFull(dateOf(i))) cur++;
-    else if(i === today) continue;   // bugun hali tugamagan
+    else if(i === today) continue;
     else break;
   }
   let best = 0, run = 0;
-  for(let i=1;i<=Math.min(today,TOTAL);i++){
-    if(isFull(dateOf(i))){ run++; best = Math.max(best, run); } else run = 0;
-  }
-  const elapsed = Math.min(today, TOTAL);
-  return { today, full, cur, best, elapsed, gap: elapsed - full };
+  for(let i=1;i<=elapsed;i++){ if(isFull(dateOf(i))){ run++; best = Math.max(best, run); } else run = 0; }
+  let written = 0;
+  for(let i=1;i<=elapsed;i++){ const d = D(dateOf(i)); if((d.free&&d.free.trim())||(d.ans&&d.ans.trim())) written++; }
+  return { today, elapsed, full, cur, best, gap: elapsed - full, written };
 }
 
-function render(){
-  const st = stats();
-  const tkey = dateOf(Math.min(st.today, TOTAL));
-  const day = S.days[tkey] || { done:[], note:"" };
-  const yKey = st.today > 1 ? dateOf(st.today - 1) : null;
-  const missedYesterday = yKey && !isFull(yKey);
+/* ---------- generic stat maths ---------- */
+const mean = a => a.length ? a.reduce((x,y)=>x+y,0)/a.length : null;
+function collect(field, pred){
+  const out = [];
+  Object.keys(S.days).forEach(k => {
+    if(pred && !pred(k)) return;
+    const v = (D(k).st || {})[field];
+    if(v != null && v !== "") out.push(Number(v));
+  });
+  return out;
+}
+function corr(xs, ys){
+  const n = xs.length;
+  if(n < 4) return null;
+  const mx = mean(xs), my = mean(ys);
+  let num = 0, dx = 0, dy = 0;
+  for(let i=0;i<n;i++){ const a = xs[i]-mx, b = ys[i]-my; num += a*b; dx += a*a; dy += b*b; }
+  if(dx === 0 || dy === 0) return null;
+  return num / Math.sqrt(dx*dy);
+}
+function pairs(fa, fb){
+  const xs = [], ys = [];
+  Object.keys(S.days).forEach(k => {
+    const st = D(k).st || {};
+    const a = fa === "habits" ? (isFull(k) ? 1 : 0) : st[fa];
+    const b = fb === "habits" ? (isFull(k) ? 1 : 0) : st[fb];
+    if(a != null && a !== "" && b != null && b !== ""){ xs.push(Number(a)); ys.push(Number(b)); }
+  });
+  return [xs, ys];
+}
+const esc = s => String(s == null ? "" : s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const money = v => v == null || v === "" ? "—" : Number(v).toLocaleString("en-US") + " " + S.cur;
 
-  const cells = [];
-  for(let i=1;i<=TOTAL;i++){
+/* ---------- charts ---------- */
+function lineChart(series, opts){
+  const o = Object.assign({ min:1, max:5, h:96, dash:[1,3,5] }, opts||{});
+  const W = 300, H = o.h, P = 6;
+  const len = Math.max(...series.map(s => s.pts.length), 1);
+  const any = series.some(s => s.pts.some(p => p != null));
+  if(!any) return `<div class="empty">Ma'lumot yo'q</div>`;
+  const x = i => P + (len === 1 ? (W-2*P)/2 : i*(W-2*P)/(len-1));
+  const y = v => H - P - (v - o.min) * (H - 2*P) / Math.max(1e-9, (o.max - o.min));
+  let svg = `<svg viewBox="0 0 ${W} ${H}" width="100%" height="${H}" preserveAspectRatio="none" role="img">`;
+  o.dash.forEach(g => { if(g >= o.min && g <= o.max)
+    svg += `<line x1="${P}" y1="${y(g).toFixed(1)}" x2="${W-P}" y2="${y(g).toFixed(1)}" stroke="#B7C3C9" stroke-width="1" stroke-dasharray="2 3"/>`; });
+  series.forEach(s => {
+    let cur = [];
+    const segs = [];
+    s.pts.forEach((v,i) => {
+      if(v == null){ if(cur.length) segs.push(cur); cur = []; }
+      else cur.push(`${x(i).toFixed(1)},${y(v).toFixed(1)}`);
+    });
+    if(cur.length) segs.push(cur);
+    segs.forEach(sg => {
+      if(sg.length === 1){ const [cx,cy] = sg[0].split(","); svg += `<circle cx="${cx}" cy="${cy}" r="2.5" fill="${s.c}"/>`; }
+      else svg += `<polyline points="${sg.join(" ")}" fill="none" stroke="${s.c}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>`;
+    });
+  });
+  return svg + `</svg>`;
+}
+function seriesOf(field, n){
+  const st = stats(), end = Math.min(st.today, TOTAL), from = Math.max(1, end - n + 1);
+  const pts = [];
+  for(let i=from;i<=end;i++){
+    const v = (D(dateOf(i)).st || {})[field];
+    pts.push(v == null || v === "" ? null : Number(v));
+  }
+  return pts;
+}
+function bars(rows, cls){
+  if(!rows.length) return `<div class="empty">Ma'lumot yo'q</div>`;
+  const max = Math.max(...rows.map(r => r.v), 1);
+  return rows.map(r => `
+    <div class="repline">
+      <div class="repname" title="${esc(r.name)}">${esc(r.name)}</div>
+      <div class="reptrack"><div class="repfill ${cls||""}" style="width:${Math.round(r.v/max*100)}%"></div></div>
+      <div class="repval">${r.label != null ? esc(r.label) : r.v}</div>
+    </div>`).join("");
+}
+
+/* ================= VIEWS ================= */
+function viewBugun(){
+  const st = stats();
+  const k = dateOf(Math.min(st.today, TOTAL));
+  const d = D(k);
+  const done = d.done || [];
+  const sc = d.st || {};
+  const tags = d.tags || [];
+  const fin = d.fin || {};
+  const yk = st.today > 1 ? dateOf(st.today - 1) : null;
+  const missedY = yk && !isFull(yk);
+  const scale = (key,lbl) => `
+    <div class="srow"><span class="slabel">${lbl}</span>
+      <div class="scale">${[1,2,3,4,5].map(n =>
+        `<button class="sb ${sc[key]===n?"on":""}" data-sk="${key}" data-sv="${n}">${n}</button>`).join("")}</div>
+    </div>`;
+
+  return `
+    ${missedY && !isFull(k) ? `<div class="warn">Kecha yopilmagan. Ketma-ket ikki kun bo'lmaydi — bugun majburiy.</div>` : ``}
+
+    <section>
+      <div class="shead"><h2>Minimum</h2>
+        <button class="linkbtn" id="edith">${editingHabits ? "Yopish" : "Tahrirlash"}</button></div>
+      ${editingHabits ? habitEditor() : S.habits.map((h,i)=>`
+        <div class="habit ${done.includes(i)?"on":""}" data-h="${i}">
+          <div class="box">${done.includes(i)?"✓":""}</div>
+          <div class="htext">${esc(h)}</div>
+        </div>`).join("")}
+    </section>
+
+    <section>
+      <div class="shead"><h2>Holat</h2><span>1 past · 5 yuqori</span></div>
+      <div class="card">
+        ${scale("e","Energiya")}
+        ${scale("m","Kayfiyat")}
+        ${scale("mo","Motivatsiya")}
+        ${scale("z","Zo'riqish")}
+        <div class="srow"><span class="slabel">Uyqu</span>
+          <input class="num" id="sleep" type="number" min="0" max="14" step="0.5" value="${sc.sl != null ? sc.sl : ""}" placeholder="—">
+          <span class="sunit">soat</span>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="shead"><h2>Emotsiyalar</h2><span>${tags.length} ta</span></div>
+      <div class="chips">
+        ${EMOTIONS.map(([n,t]) => `<button class="chip ${t} ${tags.includes(n)?"on":""}" data-tag="${esc(n)}">${esc(n)}</button>`).join("")}
+      </div>
+    </section>
+
+    <section>
+      <div class="shead"><h2>Kunlik savol</h2><span>${st.today}-kun</span></div>
+      <div class="qbox">
+        <div class="qmeta">Savol</div>
+        <div class="qtext">${esc(promptFor(Math.max(1,st.today)))}</div>
+      </div>
+      <textarea class="mid" id="ans" placeholder="Javob…">${esc(d.ans)}</textarea>
+    </section>
+
+    <section>
+      <div class="shead"><h2>Kun haqida</h2><span>erkin yozuv</span></div>
+      <textarea class="big" id="free" placeholder="Bugun nima bo'ldi…">${esc(d.free)}</textarea>
+    </section>
+
+    <section>
+      <div class="shead"><h2>Xulosa</h2><span>o'zim uchun qayd</span></div>
+      <textarea class="mid" id="note" placeholder="Nima o'rgandim, ertaga nima boshqacha bo'ladi…">${esc(d.note)}</textarea>
+    </section>
+
+    <section>
+      <div class="shead"><h2>Moliya</h2><span>${esc(S.cur)}</span></div>
+      <div class="card pad">
+        <div class="fgrid">
+          <div class="fcell"><label>Qolgan mablag'</label><input id="fbal" type="number" step="1" value="${fin.bal != null ? fin.bal : ""}" placeholder="—"></div>
+          <div class="fcell"><label>Kirim</label><input id="fin" type="number" step="1" value="${fin.in != null ? fin.in : ""}" placeholder="0"></div>
+          <div class="fcell"><label>Chiqim</label><input id="fout" type="number" step="1" value="${fin.out != null ? fin.out : ""}" placeholder="0"></div>
+        </div>
+        <div style="margin-top:6px"><input class="txt" id="fnote" value="${esc(fin.note)}" placeholder="Izoh — nimaga ketdi"></div>
+        <div class="btnrow"><button class="linkbtn" id="curbtn">Valyuta: ${esc(S.cur)}</button></div>
+      </div>
+    </section>
+
+    <div class="status" id="status"></div>
+  `;
+}
+
+function habitEditor(){
+  return `
+    <div id="rows">
+      ${S.habits.map((h,i)=>`<div class="row"><input value="${esc(h)}" data-e="${i}" maxlength="70"><button class="del" data-d="${i}">×</button></div>`).join("")}
+    </div>
+    <div class="btnrow">
+      <button class="btn ghost" id="addh">+ Qator</button>
+      <button class="btn" id="saveh">Saqlash</button>
+    </div>`;
+}
+
+function viewJurnal(){
+  const st = stats();
+  const items = [];
+  for(let i=Math.min(st.today,TOTAL); i>=1; i--){
     const k = dateOf(i);
-    const c = doneCount(k);
+    if(!hasContent(k)) continue;
+    const d = D(k), sc = d.st || {};
+    const open = openEntry === k;
+    items.push(`
+      <div class="entry">
+        <div class="ehead" data-open="${k}">
+          <div>
+            <div class="eday">${String(i).padStart(2,"0")}-kun</div>
+            <div class="edate">${fmtDate(k)}</div>
+          </div>
+          <div class="edots">
+            ${S.habits.map((_,hi)=>`<span class="dot ${(d.done||[]).includes(hi)?"f":""}"></span>`).join("")}
+          </div>
+        </div>
+        ${open ? `
+        <div class="ebody">
+          ${sc.m != null || sc.e != null ? `<h4>Holat</h4>
+            <div>Energiya ${sc.e ?? "—"} · Kayfiyat ${sc.m ?? "—"} · Motivatsiya ${sc.mo ?? "—"} · Zo'riqish ${sc.z ?? "—"} · Uyqu ${sc.sl ?? "—"} soat</div>` : ``}
+          ${(d.tags||[]).length ? `<h4>Emotsiyalar</h4><div class="etags">${d.tags.map(t=>`<span class="etag">${esc(t)}</span>`).join("")}</div>` : ``}
+          ${d.ans && d.ans.trim() ? `<h4>${esc(promptFor(i))}</h4><div>${esc(d.ans).replace(/\n/g,"<br>")}</div>` : ``}
+          ${d.free && d.free.trim() ? `<h4>Kun haqida</h4><div>${esc(d.free).replace(/\n/g,"<br>")}</div>` : ``}
+          ${d.note && d.note.trim() ? `<h4>Xulosa</h4><div>${esc(d.note).replace(/\n/g,"<br>")}</div>` : ``}
+          ${d.fin && (d.fin.bal != null || d.fin.out != null || d.fin.in != null) ? `<h4>Moliya</h4>
+            <div>Qolgan ${money(d.fin.bal)} · kirim ${money(d.fin.in)} · chiqim ${money(d.fin.out)}${d.fin.note ? " · " + esc(d.fin.note) : ""}</div>` : ``}
+        </div>` : ``}
+      </div>`);
+  }
+  return `
+    <section>
+      <div class="shead"><h2>Yozuvlar</h2><span>${items.length} kun</span></div>
+      ${items.length ? items.join("") : `<div class="empty">Hali yozuv yo'q. "Bugun" bo'limidan boshla.</div>`}
+    </section>
+
+    <section>
+      <div class="shead"><h2>Jadval</h2><span>bugun va kecha tahrirlanadi</span></div>
+      <div class="grid">${gridCells()}</div>
+      <div class="stats" style="margin-top:10px">
+        <div class="stat"><b>${stats().cur}</b><span>Seriya</span></div>
+        <div class="stat"><b>${stats().best}</b><span>Eng uzun</span></div>
+        <div class="stat"><b>${stats().full}</b><span>Yopilgan</span></div>
+        <div class="stat"><b>${stats().written}</b><span>Yozilgan</span></div>
+      </div>
+      <div class="status" id="status"></div>
+    </section>`;
+}
+
+function gridCells(){
+  const st = stats();
+  const out = [];
+  for(let i=1;i<=TOTAL;i++){
+    const k = dateOf(i), c = doneCount(k);
     let cls = "cell";
-    if(i < st.today){ cls += isFull(k) ? " done" : (c > 0 ? " part" : " miss"); }
-    else if(i === st.today){ cls += " today" + (isFull(k) ? " done" : (c > 0 ? " part" : "")); }
-    if(i === st.today || i === st.today - 1) cls += " editable";
-    cells.push(`<div class="${cls}" data-day="${i}" title="${k}">${String(i).padStart(2,"0")}</div>`);
+    if(i < st.today) cls += isFull(k) ? " done" : (c > 0 ? " part" : " miss");
+    else if(i === st.today) cls += " today" + (isFull(k) ? " done" : (c > 0 ? " part" : ""));
+    if(i === st.today || i === st.today - 1) cls += " tap";
+    out.push(`<div class="${cls}" data-day="${i}">${String(i).padStart(2,"0")}</div>`);
+  }
+  return out.join("");
+}
+
+function viewTahlil(){
+  const st = stats();
+  const N = 30;
+  const chart = lineChart([
+    { c:"#16402E", pts: seriesOf("e", N) },
+    { c:"#8A6A2F", pts: seriesOf("m", N) },
+    { c:"#7B2E22", pts: seriesOf("mo", N) },
+    { c:"#24455C", pts: seriesOf("z", N) }
+  ]);
+
+  // emotion frequency
+  const freq = {};
+  Object.keys(S.days).forEach(k => (D(k).tags || []).forEach(t => freq[t] = (freq[t]||0)+1));
+  const frows = Object.entries(freq).sort((a,b)=>b[1]-a[1]).slice(0,8).map(([n,v])=>({name:n, v, label:v+" kun"}));
+
+  // sleep buckets
+  const sleepRows = [];
+  const lo = [], hi = [];
+  Object.keys(S.days).forEach(k => {
+    const s = D(k).st || {};
+    if(s.sl == null || s.m == null) return;
+    (Number(s.sl) >= 7 ? hi : lo).push(Number(s.m));
+  });
+  if(hi.length) sleepRows.push({ name:"Uyqu ≥ 7 soat", v: mean(hi), label: mean(hi).toFixed(1) });
+  if(lo.length) sleepRows.push({ name:"Uyqu < 7 soat", v: mean(lo), label: mean(lo).toFixed(1) });
+
+  // closed vs open days
+  const cRows = [];
+  const cm = collect("m", k => isFull(k)), om = collect("m", k => !isFull(k) && hasContent(k));
+  const ce = collect("e", k => isFull(k)), oe = collect("e", k => !isFull(k) && hasContent(k));
+  if(cm.length) cRows.push({ name:"Kayfiyat · yopiq", v: mean(cm), label: mean(cm).toFixed(1) });
+  if(om.length) cRows.push({ name:"Kayfiyat · yopilmagan", v: mean(om), label: mean(om).toFixed(1) });
+  if(ce.length) cRows.push({ name:"Energiya · yopiq", v: mean(ce), label: mean(ce).toFixed(1) });
+  if(oe.length) cRows.push({ name:"Energiya · yopilmagan", v: mean(oe), label: mean(oe).toFixed(1) });
+
+  // finance
+  const finDays = Object.keys(S.days).filter(k => D(k).fin && D(k).fin.bal != null).sort();
+  const balPts = [];
+  const stEnd = Math.min(st.today, TOTAL), from = Math.max(1, stEnd - N + 1);
+  for(let i=from;i<=stEnd;i++){
+    const f = D(dateOf(i)).fin || {};
+    balPts.push(f.bal == null || f.bal === "" ? null : Number(f.bal));
+  }
+  const balVals = balPts.filter(v => v != null);
+  const outSum = Object.keys(S.days).reduce((s,k)=> s + Number((D(k).fin||{}).out || 0), 0);
+  const inSum = Object.keys(S.days).reduce((s,k)=> s + Number((D(k).fin||{}).in || 0), 0);
+  const balChart = balVals.length ? lineChart([{ c:"#24455C", pts: balPts }],
+      { min: Math.min(...balVals), max: Math.max(...balVals) || 1, h: 80, dash: [] }) : `<div class="empty">Moliya ma'lumoti yo'q</div>`;
+
+  return `
+    <section>
+      <div class="shead"><h2>Holat dinamikasi</h2><span>oxirgi 30 kun</span></div>
+      <div class="chartbox">
+        ${chart}
+        <div class="legend">
+          <div class="lg"><span class="swatch" style="background:#16402E"></span>Energiya</div>
+          <div class="lg"><span class="swatch" style="background:#8A6A2F"></span>Kayfiyat</div>
+          <div class="lg"><span class="swatch" style="background:#7B2E22"></span>Motivatsiya</div>
+          <div class="lg"><span class="swatch" style="background:#24455C"></span>Zo'riqish</div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="shead"><h2>Xulosalar</h2><span>avtomatik</span></div>
+      ${insights()}
+    </section>
+
+    <section>
+      <div class="shead"><h2>Intizom va holat</h2><span>o'rtacha 1–5</span></div>
+      <div class="card">${bars(cRows)}</div>
+    </section>
+
+    <section>
+      <div class="shead"><h2>Uyqu va kayfiyat</h2><span>o'rtacha 1–5</span></div>
+      <div class="card">${bars(sleepRows, "alt")}</div>
+    </section>
+
+    <section>
+      <div class="shead"><h2>Emotsiyalar chastotasi</h2><span>eng ko'p 8 ta</span></div>
+      <div class="card">${bars(frows, "alt")}</div>
+    </section>
+
+    <section>
+      <div class="shead"><h2>Moliya</h2><span>${esc(S.cur)}</span></div>
+      <div class="chartbox">${balChart}</div>
+      <div class="stats" style="margin-top:8px">
+        <div class="stat"><b style="font-size:15px">${finDays.length ? money(D(finDays[finDays.length-1]).fin.bal) : "—"}</b><span>Oxirgi balans</span></div>
+        <div class="stat"><b style="font-size:15px">${money(outSum)}</b><span>Jami chiqim</span></div>
+        <div class="stat"><b style="font-size:15px">${money(inSum)}</b><span>Jami kirim</span></div>
+      </div>
+    </section>
+
+    <section>
+      <div class="shead"><h2>Eksport</h2></div>
+      <div class="btnrow">
+        <button class="btn ghost" id="copyrep">Hisobotni nusxalash</button>
+        <button class="btn ghost" id="dljson">Zaxira (JSON)</button>
+      </div>
+      <div class="status" id="status"></div>
+    </section>`;
+}
+
+function insights(){
+  const out = [];
+  const st = stats();
+
+  const [xs1, ys1] = pairs("sl", "m");
+  const r1 = corr(xs1, ys1);
+  if(r1 != null && Math.abs(r1) >= 0.3)
+    out.push(r1 > 0
+      ? `Uyqu bilan kayfiyat birga harakatlanmoqda (${xs1.length} kun ma'lumot). Ko'p uxlagan kunlaring yaxshiroq o'tyapti.`
+      : `Ko'p uxlagan kunlarda kayfiyat pastroq chiqyapti — bu odatda uyqu ortiqchaligidan emas, charchoqning ortidan keladi.`);
+
+  const [xs2, ys2] = pairs("habits", "m");
+  const r2 = corr(xs2, ys2);
+  if(r2 != null && Math.abs(r2) >= 0.3)
+    out.push(r2 > 0
+      ? `Minimum bajarilgan kunlarda kayfiyating sezilarli yuqori. Intizom bu yerda sabab tomonda ko'rinyapti.`
+      : `Minimum bajarilgan kunlarda kayfiyat pastroq — ehtimol yuklama keragidan og'ir. Minimumni qayta ko'r.`);
+
+  const [xs3, ys3] = pairs("z", "m");
+  const r3 = corr(xs3, ys3);
+  if(r3 != null && r3 <= -0.3)
+    out.push(`Zo'riqish ko'tarilganda kayfiyat tushyapti — bu bog'liqlik aniq ko'rinib turibdi (${xs3.length} kun).`);
+
+  // last 7 vs previous 7
+  const recent = [], prev = [];
+  for(let i=Math.max(1,st.today-6); i<=st.today; i++){ const v = (D(dateOf(i)).st||{}).m; if(v!=null) recent.push(Number(v)); }
+  for(let i=Math.max(1,st.today-13); i<=st.today-7; i++){ const v = (D(dateOf(i)).st||{}).m; if(v!=null) prev.push(Number(v)); }
+  if(recent.length >= 3 && prev.length >= 3){
+    const dm = mean(recent) - mean(prev);
+    if(Math.abs(dm) >= 0.4)
+      out.push(dm > 0
+        ? `Oxirgi hafta o'tgan haftaga nisbatan yaxshiroq: kayfiyat o'rtacha ${dm.toFixed(1)} punktga ko'tarilgan.`
+        : `Oxirgi hafta o'tgan haftadan pastroq: kayfiyat o'rtacha ${Math.abs(dm).toFixed(1)} punktga tushgan.`);
   }
 
+  // dominant emotion
+  const freq = {};
+  Object.keys(S.days).forEach(k => (D(k).tags||[]).forEach(t => freq[t] = (freq[t]||0)+1));
+  const top = Object.entries(freq).sort((a,b)=>b[1]-a[1])[0];
+  if(top && top[1] >= 3) out.push(`Eng ko'p takrorlangan holat: ${top[0]} — ${top[1]} kun.`);
+
+  // spending vs mood
+  const sx = [], sy = [];
+  Object.keys(S.days).forEach(k => {
+    const f = D(k).fin || {}, s = D(k).st || {};
+    if(f.out != null && f.out !== "" && s.m != null){ sx.push(Number(f.out)); sy.push(Number(s.m)); }
+  });
+  const r4 = corr(sx, sy);
+  if(r4 != null && Math.abs(r4) >= 0.35)
+    out.push(r4 < 0
+      ? `Chiqim yuqori bo'lgan kunlarda kayfiyat pastroq — pul sarfi holat bilan bog'liq bo'lishi mumkin.`
+      : `Chiqim yuqori kunlar kayfiyat yuqori kunlarga to'g'ri kelyapti.`);
+
+  if(!out.length) return `<div class="empty">Xulosa uchun ma'lumot hali kam. 7–10 kun to'ldirilgach shu yerda bog'liqliklar chiqadi.</div>`;
+  return out.map(t => `<div class="insight">${t}</div>`).join("") +
+         `<div class="status">Bular statistik kuzatuv, tashxis emas</div>`;
+}
+
+/* ---------- report ---------- */
+function reportText(){
+  const st = stats();
+  const L = [];
+  L.push(`JURNAL — 60 KUN`);
+  L.push(`Boshlangan: ${S.start} · Bugun: ${Math.min(st.today,TOTAL)}/60`);
+  L.push(`Yopilgan kun: ${st.full}/${st.elapsed} · Qarz: ${st.gap} · Seriya: ${st.cur} (eng uzun ${st.best})`);
+  L.push(`Yozuvli kun: ${st.written}`);
+  const f = a => a.length ? mean(a).toFixed(1) : "—";
+  L.push(``);
+  L.push(`O'RTACHA HOLAT (1-5)`);
+  L.push(`  Energiya ${f(collect("e"))} · Kayfiyat ${f(collect("m"))} · Motivatsiya ${f(collect("mo"))} · Zo'riqish ${f(collect("z"))} · Uyqu ${f(collect("sl"))} soat`);
+  const freq = {};
+  Object.keys(S.days).forEach(k => (D(k).tags||[]).forEach(t => freq[t] = (freq[t]||0)+1));
+  const fr = Object.entries(freq).sort((a,b)=>b[1]-a[1]).slice(0,6);
+  if(fr.length){ L.push(``); L.push(`EMOTSIYALAR`); fr.forEach(([n,v]) => L.push(`  ${n}: ${v} kun`)); }
+  const outSum = Object.keys(S.days).reduce((s,k)=> s + Number((D(k).fin||{}).out||0), 0);
+  const inSum = Object.keys(S.days).reduce((s,k)=> s + Number((D(k).fin||{}).in||0), 0);
+  const fd = Object.keys(S.days).filter(k => (D(k).fin||{}).bal != null).sort();
+  if(fd.length || outSum || inSum){
+    L.push(``); L.push(`MOLIYA (${S.cur})`);
+    if(fd.length) L.push(`  Oxirgi balans: ${D(fd[fd.length-1]).fin.bal}`);
+    L.push(`  Jami kirim: ${inSum} · jami chiqim: ${outSum}`);
+  }
+  const notes = [];
+  for(let i=1;i<=Math.min(st.today,TOTAL);i++){
+    const k = dateOf(i), d = D(k);
+    if(d.note && d.note.trim()) notes.push(`  ${i}-kun — ${d.note.trim()}`);
+  }
+  if(notes.length){ L.push(``); L.push(`XULOSALAR`); notes.forEach(n => L.push(n)); }
+  return L.join("\n");
+}
+
+/* ================= RENDER ================= */
+function render(){
+  const st = stats();
+  const views = { bugun: viewBugun, jurnal: viewJurnal, tahlil: viewTahlil };
   document.getElementById("app").innerHTML = `
     <header>
       <div class="eyebrow">Shaxsiy jurnal · ${S.start} dan</div>
       <div class="titlerow">
-        <h1>60 KUN</h1>
-        <div class="counter">Bugun<b>${String(Math.min(st.today,TOTAL)).padStart(2,"0")} / 60</b></div>
+        <h1>${tab === "bugun" ? "BUGUN" : tab === "jurnal" ? "JURNAL" : "TAHLIL"}</h1>
+        <div class="counter">Kun<b>${String(Math.min(st.today,TOTAL)).padStart(2,"0")} / 60</b></div>
       </div>
     </header>
-
-    <div class="bars">
-      <div class="barrow">
-        <div class="barlabel">O'tgan</div>
-        <div class="bartrack"><div class="barfill elapsed" style="width:${st.elapsed/TOTAL*100}%"></div></div>
-        <div class="barnum">${st.elapsed}</div>
-      </div>
-      <div class="barrow">
-        <div class="barlabel">Bajarilgan</div>
-        <div class="bartrack"><div class="barfill done" style="width:${st.full/TOTAL*100}%"></div></div>
-        <div class="barnum">${st.full}</div>
-      </div>
-      ${st.gap > 0 ? `<div class="deficit">Qarz: ${st.gap} kun</div>` : ``}
-    </div>
-
-    ${missedYesterday && !isFull(tkey) ? `<div class="warn">Kecha yopilmagan. Qoida: ketma-ket ikki kun bo'lmaydi. Bugun majburiy.</div>` : ``}
-
-    <section>
-      <div class="shead">
-        <h2>Bugun — kunlik minimum</h2>
-        <button class="linkbtn" id="edit">${editing ? "Yopish" : "Tahrirlash"}</button>
-      </div>
-      <div id="todaybox">
-        ${editing ? renderEditor() : S.habits.map((h,i)=>`
-          <div class="habit ${day.done.includes(i) ? "on":""}" data-h="${i}" tabindex="0" role="checkbox" aria-checked="${day.done.includes(i)}">
-            <div class="box">${day.done.includes(i) ? "✓" : ""}</div>
-            <div class="htext">${escape(h)}</div>
-            <div class="hidx">${String(i+1).padStart(2,"0")}</div>
-          </div>`).join("")}
-        ${editing ? "" : `<textarea class="note" id="note" maxlength="160" placeholder="Kun haqida bir qator — ixtiyoriy">${escape(day.note||"")}</textarea>`}
-      </div>
-    </section>
-
-    <section>
-      <div class="shead"><h2>Jadval</h2><span class="eyebrow">Bugun va kecha tahrirlanadi</span></div>
-      <div class="grid">${cells.join("")}</div>
-      <div class="stats">
-        <div class="stat"><b>${st.cur}</b><span>Joriy seriya</span></div>
-        <div class="stat"><b>${st.best}</b><span>Eng uzun</span></div>
-        <div class="stat"><b>${st.full}</b><span>Yopilgan kun</span></div>
-      </div>
-    </section>
-
-    <section>
-      <div class="shead"><h2>Hisobot</h2><span class="eyebrow">O'tgan kunlarga nisbatan</span></div>
-      <div class="rep">${weekLines(st)}</div>
-      <div class="repnote">Har bir band bo'yicha:</div>
-      <div class="rep" style="margin-top:6px">${habitLines(st)}</div>
-      <div class="btnrow">
-        <button class="btn ghost" id="copyrep">Hisobotni nusxalash</button>
-      </div>
-    </section>
-
-    <section>
-      <div class="shead"><h2>Qoidalar</h2></div>
-      <ul class="rules">
-        <li>Minimum bajarilsa — kun yopiq. Ko'p qilgani hisobga o'tmaydi.</li>
-        <li>Ketma-ket ikki kun tashlanmaydi. Bitta kun — xato, ikkitasi — tugash.</li>
-        <li>Kecha va bugundan boshqa kun tahrirlanmaydi. Yozilgan yozilgan.</li>
-        <li>Tarozi haftada bir marta, dushanba ertalab.</li>
-      </ul>
-      <div class="btnrow">
-        <button class="btn ghost" id="reset">Jurnalni nolga qaytarish</button>
-      </div>
-      <div class="status" id="status"></div>
-    </section>
-  `;
+    ${views[tab]()}`;
+  document.getElementById("nav").innerHTML = ["bugun","jurnal","tahlil"].map(t =>
+    `<button class="${tab===t?"on":""}" data-tab="${t}">${t}</button>`).join("");
   bind();
+  window.scrollTo(0, 0);
 }
-
-function weekData(st){
-  const out = [];
-  for(let w=0; w*7 < TOTAL; w++){
-    const from = w*7+1, to = Math.min(from+6, TOTAL);
-    let el = 0, full = 0;
-    for(let i=from;i<=to;i++){
-      if(i > st.today) continue;
-      el++;
-      if(isFull(dateOf(i))) full++;
-    }
-    out.push({ n:w+1, from, to, el, full });
-  }
-  return out;
-}
-function habitData(st){
-  return S.habits.map((h,i)=>{
-    let el = 0, done = 0;
-    for(let d=1; d<=Math.min(st.today, TOTAL); d++){
-      el++;
-      if((S.days[dateOf(d)]?.done || []).includes(i)) done++;
-    }
-    return { name:h, el, done };
-  });
-}
-function bar(done, el){
-  const pct = el ? Math.round(done/el*100) : 0;
-  const cls = pct < 60 ? "repfill low" : "repfill";
-  return `<div class="reptrack"><div class="${cls}" style="width:${pct}%"></div></div>
-          <div class="repval">${done}/${el}</div>`;
-}
-function weekLines(st){
-  const rows = weekData(st).filter(w => w.el > 0);
-  if(!rows.length) return `<div class="repline"><div class="repname">Hali bo'sh</div></div>`;
-  return rows.map(w => `<div class="repline"><div class="repname">${w.n}-hafta · ${w.from}–${w.to}</div>${bar(w.full, w.el)}</div>`).join("");
-}
-function habitLines(st){
-  const rows = habitData(st);
-  if(!rows.length || st.today < 1) return `<div class="repline"><div class="repname">Hali bo'sh</div></div>`;
-  return rows.map(h => `<div class="repline"><div class="repname" title="${escape(h.name)}">${escape(h.name)}</div>${bar(h.done, h.el)}</div>`).join("");
-}
-function reportText(st){
-  const L = [];
-  L.push(`60 KUN — HISOBOT`);
-  L.push(`Boshlangan: ${S.start} · Bugun: ${Math.min(st.today,TOTAL)}/60`);
-  L.push(`Yopilgan kun: ${st.full}/${st.elapsed} · Qarz: ${st.gap}`);
-  L.push(`Joriy seriya: ${st.cur} · Eng uzun: ${st.best}`);
-  L.push(``);
-  L.push(`HAFTALAR`);
-  weekData(st).filter(w=>w.el>0).forEach(w => L.push(`  ${w.n}-hafta (${w.from}–${w.to}): ${w.full}/${w.el}`));
-  L.push(``);
-  L.push(`BANDLAR`);
-  habitData(st).forEach(h => L.push(`  ${h.name}: ${h.done}/${h.el} (${h.el?Math.round(h.done/h.el*100):0}%)`));
-  const notes = Object.entries(S.days).filter(([k,v]) => v.note && v.note.trim()).sort();
-  if(notes.length){
-    L.push(``);
-    L.push(`QAYDLAR`);
-    notes.forEach(([k,v]) => L.push(`  ${k} — ${v.note.trim()}`));
-  }
-  return L.join("\n");
-}
-
-function renderEditor(){
-  return `
-    <div id="rows">
-      ${S.habits.map((h,i)=>`<div class="row"><input value="${escape(h)}" data-e="${i}" maxlength="70"><button class="del" data-d="${i}" aria-label="O'chirish">×</button></div>`).join("")}
-    </div>
-    <div class="btnrow">
-      <button class="btn ghost" id="add">+ Qator</button>
-      <button class="btn" id="savehabits">Saqlash</button>
-    </div>`;
-}
-
-function escape(s){ return String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
 
 function bind(){
   const st = stats();
-  const tkey = dateOf(Math.min(st.today, TOTAL));
+  const k = dateOf(Math.min(st.today, TOTAL));
 
-  document.querySelectorAll(".habit").forEach(el=>{
-    const toggle = async ()=>{
-      const i = +el.dataset.h;
-      const d = S.days[tkey] || { done:[], note:"" };
-      d.done = d.done.includes(i) ? d.done.filter(x=>x!==i) : [...d.done, i];
-      S.days[tkey] = d;
-      render(); await save();
-    };
-    el.addEventListener("click", toggle);
-    el.addEventListener("keydown", e=>{ if(e.key===" "||e.key==="Enter"){ e.preventDefault(); toggle(); }});
-  });
-
-  const note = document.getElementById("note");
-  if(note) note.addEventListener("blur", async ()=>{
-    const d = S.days[tkey] || { done:[], note:"" };
-    d.note = note.value; S.days[tkey] = d; await save();
-  });
-
-  document.querySelectorAll(".cell.editable").forEach(c=>{
-    c.addEventListener("click", async ()=>{
-      const n = +c.dataset.day, k = dateOf(n);
-      const d = S.days[k] || { done:[], note:"" };
-      d.done = isFull(k) ? [] : S.habits.map((_,i)=>i);   // to'liq yopish / bo'shatish
-      S.days[k] = d;
-      render(); await save();
-    });
-  });
-
-  const eb = document.getElementById("edit");
-  if(eb) eb.addEventListener("click", ()=>{ editing = !editing; render(); });
-
-  const add = document.getElementById("add");
-  if(add) add.addEventListener("click", ()=>{
-    collect(); S.habits.push(""); render();
-  });
-  document.querySelectorAll(".del").forEach(b=>b.addEventListener("click", ()=>{
-    collect(); S.habits.splice(+b.dataset.d, 1); render();
+  document.querySelectorAll("[data-tab]").forEach(b => b.addEventListener("click", ()=>{
+    tab = b.dataset.tab; openEntry = null; render();
   }));
-  const sh = document.getElementById("savehabits");
-  if(sh) sh.addEventListener("click", async ()=>{
-    collect();
-    S.habits = S.habits.map(h=>h.trim()).filter(Boolean);
-    if(!S.habits.length) S.habits = DEFAULT_HABITS.slice();
-    editing = false; render(); await save();
+
+  document.querySelectorAll("[data-h]").forEach(el => el.addEventListener("click", async ()=>{
+    const i = +el.dataset.h;
+    const d = D(k); const done = (d.done||[]).slice();
+    setDay(k, { done: done.includes(i) ? done.filter(x=>x!==i) : done.concat(i) });
+    render(); await save();
+  }));
+
+  document.querySelectorAll("[data-sk]").forEach(b => b.addEventListener("click", async ()=>{
+    const key = b.dataset.sk, v = +b.dataset.sv;
+    const stt = Object.assign({}, D(k).st || {});
+    stt[key] = stt[key] === v ? null : v;
+    setDay(k, { st: stt });
+    render(); await save();
+  }));
+
+  document.querySelectorAll("[data-tag]").forEach(b => b.addEventListener("click", async ()=>{
+    const t = b.dataset.tag;
+    const tags = (D(k).tags || []).slice();
+    setDay(k, { tags: tags.includes(t) ? tags.filter(x=>x!==t) : tags.concat(t) });
+    render(); await save();
+  }));
+
+  const bindField = (id, fn) => {
+    const el = document.getElementById(id);
+    if(el) el.addEventListener("change", async ()=>{ fn(el.value); await save(); });
+  };
+  bindField("sleep", v => { const s = Object.assign({}, D(k).st||{}); s.sl = v === "" ? null : Number(v); setDay(k, { st:s }); });
+  bindField("ans",  v => setDay(k, { ans: v }));
+  bindField("free", v => setDay(k, { free: v }));
+  bindField("note", v => setDay(k, { note: v }));
+  const fin = f => Object.assign({}, D(k).fin || {}, f);
+  bindField("fbal",  v => setDay(k, { fin: fin({ bal: v === "" ? null : Number(v) }) }));
+  bindField("fin",   v => setDay(k, { fin: fin({ in:  v === "" ? null : Number(v) }) }));
+  bindField("fout",  v => setDay(k, { fin: fin({ out: v === "" ? null : Number(v) }) }));
+  bindField("fnote", v => setDay(k, { fin: fin({ note: v }) }));
+
+  const cb = document.getElementById("curbtn");
+  if(cb) cb.addEventListener("click", async ()=>{
+    const list = ["AED","USD","UZS","EUR"];
+    S.cur = list[(list.indexOf(S.cur) + 1) % list.length];
+    render(); await save();
   });
+
+  const eh = document.getElementById("edith");
+  if(eh) eh.addEventListener("click", ()=>{ editingHabits = !editingHabits; render(); });
+  const ah = document.getElementById("addh");
+  if(ah) ah.addEventListener("click", ()=>{ grabHabits(); S.habits.push(""); render(); });
+  document.querySelectorAll("[data-d]").forEach(b => b.addEventListener("click", ()=>{
+    grabHabits(); S.habits.splice(+b.dataset.d, 1); render();
+  }));
+  const sh = document.getElementById("saveh");
+  if(sh) sh.addEventListener("click", async ()=>{
+    grabHabits();
+    S.habits = S.habits.map(x=>x.trim()).filter(Boolean);
+    if(!S.habits.length) S.habits = DEFAULT_HABITS.slice();
+    editingHabits = false; render(); await save();
+  });
+
+  document.querySelectorAll("[data-open]").forEach(e => e.addEventListener("click", ()=>{
+    const key = e.dataset.open;
+    openEntry = openEntry === key ? null : key;
+    render();
+  }));
+
+  document.querySelectorAll(".cell.tap").forEach(c => c.addEventListener("click", async ()=>{
+    const n = +c.dataset.day, key = dateOf(n);
+    setDay(key, { done: isFull(key) ? [] : S.habits.map((_,i)=>i) });
+    render(); await save();
+  }));
 
   const cp = document.getElementById("copyrep");
   if(cp) cp.addEventListener("click", async ()=>{
-    const txt = reportText(stats());
-    try{
-      await navigator.clipboard.writeText(txt);
-      setStatus("Hisobot nusxalandi", false);
-    }catch(e){
+    const txt = reportText();
+    try{ await navigator.clipboard.writeText(txt); setStatus("Hisobot nusxalandi", false); }
+    catch(e){
       const ta = document.createElement("textarea");
       ta.value = txt; document.body.appendChild(ta); ta.select();
       try{ document.execCommand("copy"); setStatus("Hisobot nusxalandi", false); }
-      catch(_){ setStatus("Nusxalanmadi — qo'lda belgilang", true); }
+      catch(_){ setStatus("Nusxalanmadi", true); }
       ta.remove();
     }
   });
 
-  const rs = document.getElementById("reset");
-  if(rs) rs.addEventListener("click", async ()=>{
-    if(!confirm("Butun jurnal o'chadi va 60 kun bugundan qayta boshlanadi. Davom etaymi?")) return;
-    S = { start: ymd(new Date()), habits: S.habits, days:{} };
-    render(); await save();
+  const dl = document.getElementById("dljson");
+  if(dl) dl.addEventListener("click", ()=>{
+    try{
+      const blob = new Blob([JSON.stringify(S, null, 2)], { type:"application/json" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = `jurnal-${ymd(new Date())}.json`;
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(()=>URL.revokeObjectURL(a.href), 2000);
+      setStatus("Zaxira yuklandi", false);
+    }catch(e){ setStatus("Yuklanmadi", true); }
   });
 }
 
-function collect(){
-  document.querySelectorAll("[data-e]").forEach(inp=>{ S.habits[+inp.dataset.e] = inp.value; });
+function grabHabits(){
+  document.querySelectorAll("[data-e]").forEach(i => { S.habits[+i.dataset.e] = i.value; });
 }
 
 (async ()=>{ await load(); render(); })();
