@@ -121,6 +121,26 @@
   .stat b{display:block;font-size:20px;letter-spacing:-.02em}
   .stat span{font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--soft)}
 
+  .statebox{margin-top:12px;border:1px solid var(--rule);background:var(--card)}
+  .srow{display:flex;align-items:center;gap:8px;padding:9px 12px;border-bottom:1px solid var(--rule)}
+  .srow:last-child{border-bottom:none}
+  .slabel{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--soft);width:88px;flex:none}
+  .scale{display:flex;gap:4px;flex:1}
+  .sb{flex:1;font-family:var(--mono);font-size:12px;padding:7px 0;border:1px solid var(--rule);background:var(--paper);color:var(--soft);cursor:pointer}
+  .sb:hover{border-color:var(--ink)}
+  .sb.on{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+  .sleep{width:72px;font-family:var(--mono);font-size:12px;padding:7px 8px;border:1px solid var(--rule);background:var(--paper);color:var(--ink);text-align:center}
+  .sleep:focus{outline:none;border-color:var(--brass)}
+  .sunit{font-size:10px;color:var(--soft);letter-spacing:.1em}
+  .chartbox{border:1px solid var(--rule);background:var(--card);padding:12px}
+  .legend{display:flex;gap:14px;flex-wrap:wrap;margin-top:8px}
+  .lg{display:flex;align-items:center;gap:5px;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--soft)}
+  .swatch{width:12px;height:3px;flex:none}
+  .cmp{display:flex;border:1px solid var(--rule);background:var(--card);margin-top:8px}
+  .cmpcell{flex:1;padding:11px 12px;border-right:1px solid var(--rule)}
+  .cmpcell:last-child{border-right:none}
+  .cmpcell b{display:block;font-size:19px;letter-spacing:-.02em}
+  .cmpcell span{font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--soft)}
   .rep{border:1px solid var(--rule);background:var(--card)}
   .repline{display:flex;align-items:center;gap:10px;padding:9px 12px;border-bottom:1px solid var(--rule);font-size:11px}
   .repline:last-child{border-bottom:none}
@@ -295,6 +315,7 @@ function render(){
             <div class="htext">${escape(h)}</div>
             <div class="hidx">${String(i+1).padStart(2,"0")}</div>
           </div>`).join("")}
+        ${editing ? "" : stateBox(tkey)}
         ${editing ? "" : `<textarea class="note" id="note" maxlength="160" placeholder="Kun haqida bir qator — ixtiyoriy">${escape(day.note||"")}</textarea>`}
       </div>
     </section>
@@ -307,6 +328,19 @@ function render(){
         <div class="stat"><b>${st.best}</b><span>Eng uzun</span></div>
         <div class="stat"><b>${st.full}</b><span>Yopilgan kun</span></div>
       </div>
+    </section>
+
+    <section>
+      <div class="shead"><h2>Holat</h2><span class="eyebrow">Oxirgi 14 kun</span></div>
+      <div class="chartbox">
+        ${sparkline(st)}
+        <div class="legend">
+          <div class="lg"><span class="swatch" style="background:#16402E"></span>Energiya</div>
+          <div class="lg"><span class="swatch" style="background:#8A6A2F"></span>Kayfiyat</div>
+          <div class="lg"><span class="swatch" style="background:#7B2E22"></span>Motivatsiya</div>
+        </div>
+      </div>
+      ${compareBlock(st)}
     </section>
 
     <section>
@@ -388,6 +422,14 @@ function reportText(st){
   L.push(``);
   L.push(`BANDLAR`);
   habitData(st).forEach(h => L.push(`  ${h.name}: ${h.done}/${h.el} (${h.el?Math.round(h.done/h.el*100):0}%)`));
+  const cl = avgState(k => isFull(k)), op = avgState(k => !isFull(k));
+  const ff = v => v == null ? "—" : v.toFixed(1);
+  if(cl.n || op.n){
+    L.push(``);
+    L.push(`HOLAT (o'rtacha, 1-5)`);
+    L.push(`  Yopiq kunlar (${cl.n}): energiya ${ff(cl.e)} · kayfiyat ${ff(cl.m)} · motivatsiya ${ff(cl.mo)} · uyqu ${ff(cl.sl)}`);
+    L.push(`  Yopilmagan (${op.n}): energiya ${ff(op.e)} · kayfiyat ${ff(op.m)} · motivatsiya ${ff(op.mo)} · uyqu ${ff(op.sl)}`);
+  }
   const notes = Object.entries(S.days).filter(([k,v]) => v.note && v.note.trim()).sort();
   if(notes.length){
     L.push(``);
@@ -395,6 +437,89 @@ function reportText(st){
     notes.forEach(([k,v]) => L.push(`  ${k} — ${v.note.trim()}`));
   }
   return L.join("\n");
+}
+
+function stateBox(key){
+  const s = (S.days[key] && S.days[key].st) || {};
+  const scale = (k) => `<div class="scale">` + [1,2,3,4,5].map(n =>
+    `<button class="sb ${s[k]===n?"on":""}" data-sk="${k}" data-sv="${n}">${n}</button>`).join("") + `</div>`;
+  return `
+    <div class="statebox">
+      <div class="srow"><span class="slabel">Energiya</span>${scale("e")}</div>
+      <div class="srow"><span class="slabel">Kayfiyat</span>${scale("m")}</div>
+      <div class="srow"><span class="slabel">Motivatsiya</span>${scale("mo")}</div>
+      <div class="srow"><span class="slabel">Uyqu</span>
+        <input class="sleep" id="sleep" type="number" min="0" max="14" step="0.5" value="${s.sl != null ? s.sl : ""}" placeholder="—">
+        <span class="sunit">soat</span>
+      </div>
+    </div>`;
+}
+
+function seriesFor(st, k, n){
+  const out = [];
+  const end = Math.min(st.today, TOTAL);
+  const from = Math.max(1, end - n + 1);
+  for(let i=from;i<=end;i++){
+    const s = (S.days[dateOf(i)] || {}).st || {};
+    out.push({ day:i, v: s[k] != null ? s[k] : null });
+  }
+  return out;
+}
+
+function sparkline(st){
+  const keys = [["e","#16402E"],["m","#8A6A2F"],["mo","#7B2E22"]];
+  const N = 14;
+  const data = keys.map(([k,c]) => ({ c, pts: seriesFor(st, k, N) }));
+  const any = data.some(d => d.pts.some(p => p.v != null));
+  if(!any) return `<div class="repname" style="width:auto">Hali ma'lumot yo'q — bugundan belgilay boshla</div>`;
+  const W = 300, H = 92, PAD = 6;
+  const len = data[0].pts.length || 1;
+  const x = i => PAD + (len === 1 ? (W-2*PAD)/2 : i*(W-2*PAD)/(len-1));
+  const y = v => H - PAD - (v-1)*(H-2*PAD)/4;
+  let svg = `<svg viewBox="0 0 ${W} ${H}" width="100%" height="${H}" preserveAspectRatio="none" role="img" aria-label="Holat grafigi">`;
+  [1,3,5].forEach(g => { svg += `<line x1="${PAD}" y1="${y(g)}" x2="${W-PAD}" y2="${y(g)}" stroke="#B7C3C9" stroke-width="1" stroke-dasharray="2 3"/>`; });
+  data.forEach(d => {
+    const seg = [];
+    let cur = [];
+    d.pts.forEach((p,i) => {
+      if(p.v == null){ if(cur.length) seg.push(cur); cur = []; }
+      else cur.push(`${x(i)},${y(p.v)}`);
+    });
+    if(cur.length) seg.push(cur);
+    seg.forEach(s => {
+      if(s.length === 1){ const [cx,cy] = s[0].split(","); svg += `<circle cx="${cx}" cy="${cy}" r="2.5" fill="${d.c}"/>`; }
+      else svg += `<polyline points="${s.join(" ")}" fill="none" stroke="${d.c}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>`;
+    });
+  });
+  svg += `</svg>`;
+  return svg;
+}
+
+function avgState(pred){
+  const acc = { e:[], m:[], mo:[], sl:[] };
+  Object.entries(S.days).forEach(([k,v]) => {
+    if(!v.st) return;
+    if(!pred(k)) return;
+    ["e","m","mo","sl"].forEach(f => { if(v.st[f] != null) acc[f].push(Number(v.st[f])); });
+  });
+  const mean = a => a.length ? (a.reduce((x,y)=>x+y,0)/a.length) : null;
+  return { e:mean(acc.e), m:mean(acc.m), mo:mean(acc.mo), sl:mean(acc.sl), n:acc.m.length };
+}
+
+function compareBlock(st){
+  const closed = avgState(k => isFull(k));
+  const open = avgState(k => !isFull(k));
+  const f = v => v == null ? "—" : v.toFixed(1);
+  if(closed.n === 0 && open.n === 0) return "";
+  return `
+    <div class="cmp">
+      <div class="cmpcell"><b>${f(closed.m)}</b><span>Kayfiyat · yopiq kun (${closed.n})</span></div>
+      <div class="cmpcell"><b>${f(open.m)}</b><span>Kayfiyat · yopilmagan (${open.n})</span></div>
+    </div>
+    <div class="cmp">
+      <div class="cmpcell"><b>${f(closed.sl)}</b><span>Uyqu · yopiq kun</span></div>
+      <div class="cmpcell"><b>${f(open.sl)}</b><span>Uyqu · yopilmagan</span></div>
+    </div>`;
 }
 
 function renderEditor(){
@@ -458,6 +583,24 @@ function bind(){
     S.habits = S.habits.map(h=>h.trim()).filter(Boolean);
     if(!S.habits.length) S.habits = DEFAULT_HABITS.slice();
     editing = false; render(); await save();
+  });
+
+  document.querySelectorAll("[data-sk]").forEach(b => b.addEventListener("click", async ()=>{
+    const k = b.dataset.sk, v = +b.dataset.sv;
+    const d = S.days[tkey] || { done:[], note:"" };
+    d.st = d.st || {};
+    d.st[k] = (d.st[k] === v) ? null : v;
+    S.days[tkey] = d;
+    render(); await save();
+  }));
+
+  const sl = document.getElementById("sleep");
+  if(sl) sl.addEventListener("change", async ()=>{
+    const d = S.days[tkey] || { done:[], note:"" };
+    d.st = d.st || {};
+    d.st.sl = sl.value === "" ? null : Number(sl.value);
+    S.days[tkey] = d;
+    render(); await save();
   });
 
   const cp = document.getElementById("copyrep");
